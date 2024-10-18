@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3500;
 connectDB();
 
 app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 
 app.get('/', (req, res) => {
     res.send("Hello from Node API Server");
@@ -56,7 +57,21 @@ app.put('/api/product/:id', async (req, res) => {
     } catch (error) {
         res.status(500).json({message: error.message});
     }
-})
+});
+
+app.delete('/api/product/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findByIdAndDelete(id);
+        
+        if(!product) {
+            return res.status(404).json({message: "Product not found!"});
+        }
+        res.status(200).json({messge: "Product deleted succressfully"});
+    } catch (error) {
+        res.status(500).json({message: error.messgae});
+    }
+});
 
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB');
